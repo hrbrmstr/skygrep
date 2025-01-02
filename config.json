@@ -7,8 +7,8 @@
     },
     {
       "field": "text",
-      "pattern": "AI|artificial intelligence",
-      "kafkaTopic": "ai_posts"
+      "pattern": "cve-\\d{4}-\\d+|CVE-\\d{4}-\\d+",
+      "kafkaTopic": "cve_mentions"
     }
   ],
   "kafka": {

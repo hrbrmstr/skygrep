@@ -35,7 +35,7 @@ try {
 
 const ruleMetrics = new Map<string, number>();
 config.rules.forEach((rule) => {
-  ruleMetrics.set(rule.pattern, 0);
+  ruleMetrics.set(rule.kafkaTopic, 0);
 });
 
 const HOUR_MICROSECONDS = 1 * 60 * 60 * 1000 * 1000;
@@ -77,7 +77,10 @@ jetstream.onCreate("app.bsky.feed.post", async (event) => {
   for (const rule of config.rules) {
     const fieldValue = record[rule.field] as string;
     if (fieldValue && new RegExp(rule.pattern).test(fieldValue)) {
-      ruleMetrics.set(rule.pattern, (ruleMetrics.get(rule.pattern) || 0) + 1);
+      ruleMetrics.set(
+        rule.kafkaTopic,
+        (ruleMetrics.get(rule.kafkaTopic) || 0) + 1,
+      );
 
       await producer.send({
         topic: rule.kafkaTopic,
