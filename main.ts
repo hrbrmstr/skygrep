@@ -3,6 +3,26 @@ import { Kafka } from "npm:kafkajs";
 import { Config, PostRecord } from "./types/config.ts";
 import { parseArgs } from "jsr:@std/cli/parse-args";
 
+// Add at the top with other imports
+const logger = {
+  info: (msg: string, data?: Record<string, unknown>) => {
+    console.log(JSON.stringify({
+      level: "info",
+      timestamp: new Date().toISOString(),
+      message: msg,
+      ...data,
+    }));
+  },
+  error: (msg: string, data?: Record<string, unknown>) => {
+    console.error(JSON.stringify({
+      level: "error",
+      timestamp: new Date().toISOString(),
+      message: msg,
+      ...data,
+    }));
+  },
+};
+
 const flags = parseArgs(Deno.args, {
   default: { hours: "24", port: "3030" },
   string: ["hours", "port"],
@@ -28,8 +48,13 @@ let config: Config;
 
 try {
   config = JSON.parse(await Deno.readTextFile("./config.json"));
+  logger.info("Configuration loaded", {
+    numRules: config.rules.length,
+    kafkaBrokers: config.kafka.brokers.length,
+  });
 } catch (error) {
-  console.error("Failed to load configuration:", error);
+  const msg = (error as Error).message;
+  logger.error("Failed to load configuration", { error: msg });
   Deno.exit(1);
 }
 
@@ -51,11 +76,12 @@ const kafka = new Kafka({
 const producer = kafka.producer();
 
 producer.on("producer.disconnect", () => {
-  console.error("Kafka producer disconnected");
+  logger.error("Kafka producer disconnected");
   healthStatus.isHealthy = false;
 });
 
 await producer.connect();
+logger.info("Connected to Kafka");
 
 const healthStatus = {
   startTime: Date.now(),
@@ -82,14 +108,25 @@ jetstream.onCreate("app.bsky.feed.post", async (event) => {
         (ruleMetrics.get(rule.kafkaTopic) || 0) + 1,
       );
 
-      await producer.send({
-        topic: rule.kafkaTopic,
-        messages: [
-          {
-            value: JSON.stringify(event.commit.record),
-          },
-        ],
-      });
+      try {
+        await producer.send({
+          topic: rule.kafkaTopic,
+          messages: [
+            {
+              value: JSON.stringify(event.commit.record),
+            },
+          ],
+        });
+        logger.info("Message sent to Kafka", {
+          topic: rule.kafkaTopic,
+        });
+      } catch (error) {
+        const msg = (error as Error).message;
+        logger.error("Failed to send message to Kafka", {
+          topic: rule.kafkaTopic,
+          error: msg,
+        });
+      }
     }
   }
 });
@@ -132,6 +169,7 @@ Deno.serve({ port: parseInt(flags.port) }, (req) => {
 });
 
 const cleanup = async () => {
+  logger.info("Shutting down service");
   await producer.disconnect();
   Deno.exit(0);
 };
@@ -140,3 +178,7 @@ Deno.addSignalListener("SIGINT", cleanup);
 Deno.addSignalListener("SIGTERM", cleanup);
 
 jetstream.start();
+logger.info("Service started", {
+  cursorHours,
+  port: flags.port,
+});
