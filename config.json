@@ -1,0 +1,17 @@
+{
+  "rules": [
+    {
+      "field": "text",
+      "pattern": "crypto|bitcoin",
+      "kafkaTopic": "crypto_posts"
+    },
+    {
+      "field": "text",
+      "pattern": "AI|artificial intelligence",
+      "kafkaTopic": "ai_posts"
+    }
+  ],
+  "kafka": {
+    "brokers": ["localhost:19092"]
+  }
+}
