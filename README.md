@@ -35,6 +35,16 @@ just start
 
 and Docker Compose will do everything for you.
 
+It's pretty efficient, resource-wise:
+
+```bash
+$ docker stats
+CONTAINER ID   NAME               CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O        PIDS
+24aa1f3f6169   skygrep            33.67%    59.73MiB / 15.66GiB   0.37%     1.71GB / 23.5MB   169MB / 3.46MB   5
+962906967b45   redpanda-console   0.01%     24.26MiB / 15.66GiB   0.15%     153kB / 269kB     167MB / 8.19kB   10
+3d5bbc67bf81   redpanda-0         1.03%     1.824GiB / 15.66GiB   11.65%    2.85MB / 397kB    255MB / 7.21MB   3
+```
+
 ## 🚀 Getting Started
 
 1. Clone the repository:
@@ -78,6 +88,7 @@ just dev
 - `just clean` — clean up docker resources — this also deletes the volume
 - `just default` — show tasks
 - `just dev` — dev mode
+- `just health-check` — monitor the health of Skygrep
 - `just reset` — rebuild and run fresh instance — this also deletes the volume
 - `just start` — start services
 - `just stop` — stop docker w/o deleting the volume

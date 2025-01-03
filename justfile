@@ -38,3 +38,7 @@ watch-metrics:
     printf "\rcrypto_posts: %d | cve_mentions: %d" "$crypto" "$cve"
     sleep 5
   done
+
+# monitor the health of Skygrep
+@health-check:
+   docker inspect skygrep | jq '.[] | .State.Health'
