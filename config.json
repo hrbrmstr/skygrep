@@ -13,5 +13,8 @@
   ],
   "kafka": {
     "brokers": ["localhost:19092"]
+  },
+  "jetstream": {
+    "endpoint": "wss://jetstream2.us-east.bsky.network/subscribe"
   }
 }
