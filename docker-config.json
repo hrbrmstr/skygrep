@@ -1,0 +1,21 @@
+{
+  "rules": [
+    {
+      "field": "text",
+      "pattern": "crypto|bitcoin",
+      "kafkaTopic": "crypto_posts"
+    },
+    {
+      "field": "text",
+      "pattern": "cve-\\d{4}-\\d+|CVE-\\d{4}-\\d+",
+      "kafkaTopic": "cve_mentions"
+    }
+  ],
+  "kafka": {
+    "clientId": "skygrep",
+    "brokers": ["redpanda-0:9092"]
+  },
+  "jetstream": {
+    "endpoint": "wss://jetstream2.us-east.bsky.network/subscribe"
+  }
+}

@@ -19,6 +19,22 @@ A real-time Bluesky Jetstream firehose consumer that filters and forwards posts 
 - [Docker](https://www.docker.com/) and Docker Compose
 - [just](https://github.com/casey/just) command runner
 
+## 🏃🏼‍♀️ Quickstart
+
+Edit `docker-config.json` to setup `rules` for what you want to monitor then run:
+
+```bash
+docker compose up --build -d
+```
+
+or
+
+```bash
+just start
+```
+
+and Docker Compose will do everything for you.
+
 ## 🚀 Getting Started
 
 1. Clone the repository:
@@ -58,13 +74,14 @@ just dev
 
 ## 🔧 Available Commands
 
-- `just dev` - Start development environment with hot reloading
-- `just run` - Build and run the application
-- `just build` - Compile the application
-- `just clean` - Clean up Docker resources
-- `just stop` - Stop Docker services
-- `just reset` - Reset and rebuild the environment
-- `just watch-metrics` - Watch metrics in real-time
+- `just build` — build cli
+- `just clean` — clean up docker resources — this also deletes the volume
+- `just default` — show tasks
+- `just dev` — dev mode
+- `just reset` — rebuild and run fresh instance — this also deletes the volume
+- `just start` — start services
+- `just stop` — stop docker w/o deleting the volume
+- `just watch-metrics` — watch metrics with live updates every 5 seconds
 
 ## 📊 Monitoring
 
@@ -85,9 +102,9 @@ Access health status at `http://localhost:3030/health`
 Example response:
 ```json
 {
-  "startTime": 1709347200000,
-  "isHealthy": true,
-  "lastEventTime": 1709347500000
+  "status": "healthy",
+  "uptime_ms": 20918,
+  "last_event_ms_ago": 0
 }
 ```
 
@@ -108,6 +125,9 @@ The application consists of several key components:
   - Admin API: localhost:19644
 - **Redpanda Console**: Web UI for managing Kafka
   - Interface: http://localhost:9080
+- **Skygrep**:
+  - Health: http://localhost:3030/health
+  - Metrics: http://localhost:3030/metrics
 
 ## 📝 Configuration Options
 

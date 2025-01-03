@@ -1,12 +1,14 @@
 import { Jetstream } from "npm:@skyware/jetstream";
 import { Config, PostRecord } from "../types/types.ts";
 import { logger } from "../utils/logger.ts";
+import { HealthStatus } from "../types/types.ts";
 
 export function setupJetstream(
   cursorMicroseconds: number,
   config: Config,
   producer: any,
   ruleMetrics: Map<string, number>,
+  healthStatus: HealthStatus,
 ) {
   const jetstream = new Jetstream({
     endpoint: config.jetstream.endpoint,
@@ -15,6 +17,9 @@ export function setupJetstream(
   });
 
   jetstream.onCreate("app.bsky.feed.post", async (event) => {
+    healthStatus.lastEventTime = Date.now();
+    const key =
+      `at://did:plc:${event.did}/app.bsky.feed.post/${event.commit.rkey}`;
     const record = event.commit.record as unknown as PostRecord;
 
     for (const rule of config.rules) {
@@ -30,7 +35,8 @@ export function setupJetstream(
             topic: rule.kafkaTopic,
             messages: [
               {
-                value: JSON.stringify(event.commit.record),
+                key,
+                value: JSON.stringify(event),
               },
             ],
           });

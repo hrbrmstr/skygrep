@@ -26,4 +26,5 @@ export interface HealthStatus {
   startTime: number;
   isHealthy: boolean;
   lastEventTime: number;
+  kafkaConnected: boolean;
 }
