@@ -14,7 +14,7 @@ set quiet
   deno compile --allow-read --allow-env --allow-net main.ts
 
 # start services
-@start: stop
+@start:
   docker compose up --build -d
 
 # stop docker w/o deleting the volume
