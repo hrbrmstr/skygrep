@@ -64,6 +64,17 @@ cd skygrep
   },
   "rules": [
     {
+      "type": "collection",
+      "collections": [
+        "sh.tangled.repo",
+        "sh.tangled.feed.star",
+        "sh.tangled.graph.follow",
+        "sh.tangled.publicKey",
+        "sh.tangled.repo.issue.comment"
+      ],
+      "kafkaTopic": "tangled"
+    },
+    {
       "field": "text",
       "pattern": "(?i)(bitcoin|crypto|eth|nft)",
       "kafkaTopic": "crypto_posts"
@@ -125,7 +136,7 @@ The application consists of several key components:
 
 1. **Jetstream Client**: Connects to Bluesky's firehose and receives real-time posts
 2. **Kafka Producer**: Forwards matched posts to configured Kafka topics
-3. **Rule Engine**: Applies regex patterns to filter relevant posts
+3. **Rule Engine**: Applies regex patterns to filter relevant posts or captures events for one or more collections
 4. **Metrics Server**: Exposes operational metrics and health status
 
 ## 🐳 Docker Services

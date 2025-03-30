@@ -1,6 +1,17 @@
 {
   "rules": [
     {
+      "type": "collection",
+      "collections": [
+        "sh.tangled.repo",
+        "sh.tangled.feed.star",
+        "sh.tangled.graph.follow",
+        "sh.tangled.publicKey",
+        "sh.tangled.repo.issue.comment"
+      ],
+      "kafkaTopic": "tangled"
+    },
+    {
       "field": "text",
       "pattern": "crypto|bitcoin",
       "kafkaTopic": "crypto_posts"

@@ -11,7 +11,7 @@ set quiet
 
 # build cli
 @build:
-  deno compile --allow-read --allow-env --allow-net main.ts
+  deno compile --allow-read --allow-env --allow-net src/main.ts
 
 # start services
 @start:

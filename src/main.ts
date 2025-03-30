@@ -66,35 +66,38 @@ const jetstream = setupJetstream(
 );
 
 // HTTP endpoints
-const server = Deno.serve({ port: parseInt(flags.port) }, async (req) => {
-  try {
-    const url = new URL(req.url);
+const server = Deno.serve(
+  { port: parseInt(flags.port), hostname: "127.0.0.1" },
+  async (req) => {
+    try {
+      const url = new URL(req.url);
 
-    switch (url.pathname) {
-      case "/metrics":
-        return handleMetrics(ruleMetrics);
-      case "/health":
-        return handleHealth(healthStatus);
-      default:
-        return new Response("Not Found", { status: 404 });
-    }
-  } catch (error) {
-    const msg = (error as Error).message;
-    logger.error("HTTP server error", { error: msg });
-    return new Response(
-      JSON.stringify({
-        error: "Internal Server Error",
-        message: "An unexpected error occurred",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
+      switch (url.pathname) {
+        case "/metrics":
+          return handleMetrics(ruleMetrics);
+        case "/health":
+          return handleHealth(healthStatus);
+        default:
+          return new Response("Not Found", { status: 404 });
+      }
+    } catch (error) {
+      const msg = (error as Error).message;
+      logger.error("HTTP server error", { error: msg });
+      return new Response(
+        JSON.stringify({
+          error: "Internal Server Error",
+          message: "An unexpected error occurred",
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      },
-    );
-  }
-});
+      );
+    }
+  },
+);
 
 const cleanup = async () => {
   logger.info("Starting graceful shutdown");
@@ -107,7 +110,10 @@ const cleanup = async () => {
     await Promise.race([
       jetstream.close(),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Jetstream shutdown timeout")), 5000)
+        setTimeout(
+          () => reject(new Error("Jetstream shutdown timeout")),
+          5000,
+        )
       ),
     ]);
 
@@ -115,7 +121,10 @@ const cleanup = async () => {
     await Promise.race([
       producer.disconnect(),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Kafka shutdown timeout")), 5000)
+        setTimeout(
+          () => reject(new Error("Kafka shutdown timeout")),
+          5000,
+        )
       ),
     ]);
 
@@ -123,7 +132,9 @@ const cleanup = async () => {
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Flush logs
     Deno.exit(0);
   } catch (error) {
-    logger.error("Error during shutdown", { error: (error as Error).message });
+    logger.error("Error during shutdown", {
+      error: (error as Error).message,
+    });
     Deno.exit(1);
   }
 };
